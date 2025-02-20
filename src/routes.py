@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from qdrant_client.http.models import VectorParams, Distance
 from qdrant_client.models import PointStruct
 
+from celery_app import process_urls
 from fetch_html import fetch_html, extract_text_from_html, vectorize_text
 from src.parser import fetch_sitemap
 
@@ -20,17 +21,9 @@ class ParseRequest(BaseModel):
 @router.post("/parse")
 async def parse(request: ParseRequest):
     status["last_run"] = "running"
-
-    urls = await fetch_sitemap(request.url)
-    for url in urls:
-        html = await fetch_html(url)
-        cleaned_text = extract_text_from_html(html)
-        vector = vectorize_text(cleaned_text)
-        point = PointStruct(vector=vector, id=hash(url), payload={"url": url, "text": cleaned_text})
-        client.upsert(collection_name=os.getenv("COLLECTION_NAME", "sitemap_vector"), points=[point])
-
-    status["last_run"] = "finished"
-    return {"parsing is finished"}
+    task = process_urls.delay(request.url)
+    status["task_id"] = task.id
+    return {"status": status["last_run"], "task_id": task.id}
 
 @router.get("/status")
 def get_status():
