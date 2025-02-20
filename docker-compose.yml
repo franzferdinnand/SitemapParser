@@ -18,3 +18,35 @@ services:
     ports:
       - "6379:6379"
     restart: always
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant_db
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+#  celery_worker:
+#    build: .
+#    container_name: celery_worker
+#    command: [ "celery", "-A", "src.celery_app", "worker", "--loglevel=info" ]
+#    depends_on:
+#      - redis
+#    env_file:
+#      - .env
+#    volumes:
+#      - .:/app
+#
+#  flower:
+#    image: mher/flower
+#    container_name: flower_dashboard
+#    command: [ "flower", "--broker=redis://redis:6379/0", "--port=5555" ]
+#    ports:
+#      - "5555:5555"
+#    depends_on:
+#      - redis
+#      - celery_worker
+
+volumes:
+  qdrant_data:

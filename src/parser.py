@@ -8,7 +8,7 @@ async def fetch_sitemap(sitemap_url:str):
         async with aiohttp.ClientSession() as session:
             async with session.get(sitemap_url) as response:
                 if response.status != 200:
-                    raise HTTPException(status_code=400, detail="unable to download Sitemap")
+                    raise HTTPException(status_code=response.status, detail="unable to download Sitemap")
                 xml_data = await response.text()
                 return parse_sitemap(xml_data)
     except Exception as e:
