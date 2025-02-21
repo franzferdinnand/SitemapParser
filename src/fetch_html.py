@@ -14,14 +14,12 @@ redis = None
 
 nlp = spacy.load("en_core_web_md")
 
-async def connect_redis():
-    global redis
-    if redis is None:
-        redis = await aioredis.from_url(f"redis://{REDIS_HOST}:{REDIS_PORT}")
-    return redis
+
+async def get_redis_connection():
+    return await aioredis.from_url(f"redis://{REDIS_HOST}:{REDIS_PORT}", decode_responses=True)
 
 async def fetch_html(url:str):
-    redis_connection = await connect_redis()
+    redis_connection = await get_redis_connection()
     cached_response = await redis_connection.get(url)
 
     if cached_response:
@@ -32,10 +30,11 @@ async def fetch_html(url:str):
             async with session.get(url) as response:
                 if response.status != 200:
                     raise HTTPException(status_code=response.status, detail="unable to download Sitemap")
-                await redis_connection.set(url, response.text, ex=os.getenv("REDIS_CACHE_STORAGE_TIME", 3600))
-                return await response.text()
+                html_content = await response.text()
+                await redis_connection.set(url, html_content, ex=int(os.getenv("REDIS_CACHE_STORAGE_TIME", 3600)))
+                return html_content
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise ValueError(f"error {e}")
 
 def extract_text_from_html(html_text:str):
     tree = HTMLParser(html_text)

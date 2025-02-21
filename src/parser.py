@@ -17,7 +17,7 @@ async def fetch_sitemap(sitemap_url:str):
 def parse_sitemap(xml_data:str):
     try:
         root = ET.fromstring(xml_data)
-        urls = {elem.text for elem in root.iter("{http://www.sitemaps.org/schemas/sitemap/0.9}loc")}
-        return list(urls)
+        urls = [elem.text for elem in root.iter("{http://www.sitemaps.org/schemas/sitemap/0.9}loc")]
+        return urls
     except ET.ParseError:
         raise HTTPException(status_code=400, detail="Error in parse sitemap.xml")

@@ -19,20 +19,14 @@ services:
       - "6379:6379"
     restart: always
 
-  qdrant:
-    image: qdrant/qdrant:latest
-    container_name: qdrant_db
-    ports:
-      - "6333:6333"
-    volumes:
-      - qdrant_data:/qdrant/storage
 
   celery_worker:
     build: .
     container_name: celery_worker
-    command: [ "celery", "-A", "src.celery_app", "worker", "--loglevel=info" ]
+    entrypoint: [ "celery", "-A", "src.celery_app", "worker", "--loglevel=info" ]
     depends_on:
       - redis
+    restart: always
     env_file:
       - .env
     volumes:
@@ -47,6 +41,3 @@ services:
 #    depends_on:
 #      - redis
 #      - celery_worker
-
-volumes:
-  qdrant_data:
