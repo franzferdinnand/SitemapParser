@@ -1,16 +1,18 @@
 import os
 
 import aiohttp
-import aioredis
+import redis.asyncio as aioredis
+import spacy
+
 from fastapi import HTTPException
 from selectolax.parser import HTMLParser
-from sentence_transformers import SentenceTransformer
+
 
 REDIS_HOST = os.getenv("REDIS_HOST", "redis")
 REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
 redis = None
 
-model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+nlp = spacy.load("en_core_web_md")
 
 async def connect_redis():
     global redis
@@ -44,4 +46,4 @@ def extract_text_from_html(html_text:str):
     return text.strip()
 
 def vectorize_text(text:str):
-    return model.encode(text).tolist()
+    return nlp(text).vector

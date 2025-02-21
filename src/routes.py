@@ -1,14 +1,12 @@
 import os
 import qdrant_client
 
-from fastapi import APIRouter, BackgroundTasks, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
 from qdrant_client.http.models import VectorParams, Distance
-from qdrant_client.models import PointStruct
 
-from celery_app import process_urls
-from fetch_html import fetch_html, extract_text_from_html, vectorize_text
-from src.parser import fetch_sitemap
+from src.celery_app import process_urls
+
 
 router = APIRouter()
 status = {"last_run": "None"}
