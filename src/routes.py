@@ -9,7 +9,6 @@ from src.celery_app import process_sitemap
 
 
 router = APIRouter()
-last_status = {"last_run": "None"}
 redis_client = aioredis.from_url(os.getenv("REDIS_URL", "redis://redis:6379/0"))
 
 
@@ -35,5 +34,3 @@ async def reset_database():
     await delete_database()
     await redis_client.set("status", "waiting")
     return {"database is deleted"}
-
-

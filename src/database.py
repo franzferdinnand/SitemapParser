@@ -9,7 +9,7 @@ def get_mongo_client():
 
 async def get_database():
     client = get_mongo_client()
-    return client["sitemap_parser"]
+    return client[os.getenv("MONGO_DB_NAME", "sitemap_parser")]
 
 async def create_indexes():
     db = await get_database()
@@ -30,4 +30,4 @@ async def save_url(url:str):
 
 async def delete_database():
     client = get_mongo_client()
-    await client.drop_database("sitemap_parser")
+    await client.drop_database(os.getenv("MONGO_DB_NAME", "sitemap_parser"))
