@@ -46,8 +46,6 @@ services:
       - .:/app
 
 
-volumes:
-  mongo_db_data:
 
 #  flower:
 #    image: mher/flower
@@ -58,3 +56,19 @@ volumes:
 #    depends_on:
 #      - redis
 #      - celery_worker
+
+  flower:
+    image: mher/flower
+    container_name: flower
+    depends_on:
+      - redis
+      - celery_worker
+    env_file:
+      - .env
+    ports:
+      - "5555:5555"
+    command: ["celery", "flower", "--broker=redis://redis:6379/0", "--port=5555"]
+
+
+volumes:
+  mongo_db_data:
