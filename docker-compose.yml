@@ -11,6 +11,19 @@ services:
       - .env
     depends_on:
       - redis
+      - mongo_db
+
+  mongo_db:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    container_name: mongo_db
+    ports:
+      - "27017:27017"
+    restart: always
+    env_file:
+      - .env
+    command: mongod --quiet --logpath /dev/null
+    volumes:
+      - mongo_db_data:/data/db
 
   redis:
     image: redis:latest
@@ -31,6 +44,10 @@ services:
       - .env
     volumes:
       - .:/app
+
+
+volumes:
+  mongo_db_data:
 
 #  flower:
 #    image: mher/flower

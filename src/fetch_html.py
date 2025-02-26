@@ -41,8 +41,9 @@ def extract_text_from_html(html_text:str):
     for tag in ["script", "style", "nav", "footer", "aside", "header"]:
         for node in tree.css(tag):
             node.decompose()
-    text = "\n".join(node.text(strip=True) for node in tree.css("p, h1, h2, h3, h4, h5, h6, li, blockquote"))
-    return text.strip()
+    text = " ".join(node.text(strip=True) for node in tree.css("p, h1, h2, h3, h4, h5, h6, li, blockquote"))
+    clean_text = text.replace("\n", " ")
+    return clean_text.strip()
 
 def vectorize_text(text:str):
     return nlp(text).vector

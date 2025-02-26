@@ -1,11 +1,16 @@
+import os
+from redis import asyncio as aioredis
+
 from fastapi import APIRouter
 from pydantic import BaseModel
 
+from src.database import delete_database
+from src.celery_app import process_sitemap
 
-from src.celery_app import process_sitemap, status
 
 router = APIRouter()
-
+last_status = {"last_run": "None"}
+redis_client = aioredis.from_url(os.getenv("REDIS_URL", "redis://redis:6379/0"))
 
 
 class ParseRequest(BaseModel):
@@ -13,18 +18,22 @@ class ParseRequest(BaseModel):
 
 @router.post("/parse")
 async def parse(request: ParseRequest):
-    global status
+    await redis_client.set("status", "PARSING")
     task = process_sitemap.delay(request.url)
-    status["task_id"] = task.id
-    return {"status": status["last_run"], "task_id": task.id}
+    return {
+        "task_id": task.id,
+        "status": await redis_client.get("status")
+    }
 
 @router.get("/status")
-def get_status():
-    return status
+async def get_status():
+    status = await redis_client.get("status")
+    return {"status": status}
 
 @router.delete("/delete")
-def reset_database():
-    status["last_run"] = "None"
+async def reset_database():
+    await delete_database()
+    await redis_client.set("status", "waiting")
     return {"database is deleted"}
 
 
