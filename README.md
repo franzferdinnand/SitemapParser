@@ -72,11 +72,6 @@ docker compose up --build
   GET /urls
   ```
 
-- Semantic search:
-  ```
-  GET /search?q=example.com/product-1
-  ```
-
 ## 🧠 Semantic Search
 
 The project uses **sentence embeddings** to represent URLs and stores them as vectors in **Pinecone**. This allows semantic similarity search — finding URLs that are conceptually related, not just exact text matches.
