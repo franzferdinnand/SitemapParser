@@ -103,7 +103,7 @@ docker compose up --build
 - Upload a sitemap for parsing:
   ```
   POST /parse
-  Body: { "url": "your sitemap url" }
+  Body: { "url": "https://sitemaps.org/sitemap.xml" }
   ```
 
 - See Parser Status:
