@@ -28,18 +28,59 @@
 
 ```
 SitemapParser/
-├── docker-compose.yml
+├── .env # Environment variables
 ├── Dockerfile
+├── docker-compose.yml
 ├── requirements.txt
-├── sitemaps/                    # Input XML sitemaps
+├── README.md
+├── LICENSE
 ├── src/
-│   ├── main.py                  # FastAPI entry point
-│   ├── parser.py                # Async sitemap parsing logic
-│   ├── vector_store.py          # Pinecone integration
-│   ├── cache.py                 # Redis caching functions
-│   ├── db.py                    # MongoDB connection and operations
-│   └── routes/                  # FastAPI endpoint definitions
-└── README.md
+│ ├── main.py # FastAPI app entry point
+│ ├── routes.py # API routes
+│ ├── parser.py # Sitemap XML parsing
+│ ├── fetch_html.py # Async HTML fetching
+│ ├── database.py # MongoDB and Redis setup
+│ ├── celery_app.py # Celery worker
+│ └── addons/ # Additional modules
+```
+
+## 🔧 Environment Variables
+
+Below is a description of the environment variables used in the project. Create a .env file in the root of the repository with the following variables:
+
+```
+# URL to the XML sitemap to parse
+SITEMAP_URL=https://sitemaps.org/sitemap.xml
+
+# Redis configuration for caching and Celery broker
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_CACHE_STORAGE_TIME=3600
+REDIS_URL=redis://redis:6379/0
+
+# FastAPI application settings
+FASTAPI_APP_HOST=localhost
+FASTAPI_APP_PORT=8000
+
+# Pinecone vector database configuration
+PINECONE_HOST=pinecone
+PINECONE_PORT=7000
+PINECONE_API_KEY=<your-pinecone-api-key>
+PINECONE_INDEX_NAME=sitemap_vector
+
+# MongoDB configuration
+MONGO_DB_URI=mongodb://mongo_db:27017
+MONGO_DB_NAME=sitemap_parser
+
+# Flower dashboard for Celery task monitoring
+FLOWER_PORT=5555
+
+# Celery broker configuration
+CELERY_BROKER_URL=redis://redis:6379/0
+
+# Ensures logs are output immediately (useful for Docker)
+PYTHONUNBUFFERED=1
+
 ```
 
 ## 🚀 Getting Started
@@ -57,8 +98,6 @@ cd SitemapParser
 docker compose up --build
 ```
 
-> 📂 Place your `.xml` sitemap files in the `sitemaps/` directory.
-
 ## 🔗 Example API Usage
 
 - Upload a sitemap for parsing:
@@ -67,7 +106,7 @@ docker compose up --build
   Body: { "url": "your sitemap url" }
   ```
 
-- List parsed URLs:
+- See Parser Status:
   ```
   GET /status
   ```
