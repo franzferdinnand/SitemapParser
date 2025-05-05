@@ -63,13 +63,13 @@ docker compose up --build
 
 - Upload a sitemap for parsing:
   ```
-  POST /upload-sitemap
-  Body: { "filename": "sitemaps/my_sitemap.xml" }
+  POST /parse
+  Body: { "url": "your sitemap url" }
   ```
 
 - List parsed URLs:
   ```
-  GET /urls
+  GET /status
   ```
 
 ## 🧠 Semantic Search
