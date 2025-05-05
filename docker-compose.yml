@@ -1,0 +1,74 @@
+version: "1.01"
+services:
+  fastapi:
+    build: .
+    container_name: Sitemap_parser
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - mongo_db
+
+  mongo_db:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    container_name: mongo_db
+    ports:
+      - "27017:27017"
+    restart: always
+    env_file:
+      - .env
+    command: mongod --quiet --logpath /dev/null
+    volumes:
+      - mongo_db_data:/data/db
+
+  redis:
+    image: redis:latest
+    container_name: redis_cache
+    ports:
+      - "6379:6379"
+    restart: always
+
+
+  celery_worker:
+    build: .
+    container_name: celery_worker
+    entrypoint: [ "celery", "-A", "src.celery_app", "worker", "--loglevel=info" ]
+    depends_on:
+      - redis
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+
+
+
+#  flower:
+#    image: mher/flower
+#    container_name: flower_dashboard
+#    command: [ "flower", "--broker=redis://redis:6379/0", "--port=5555" ]
+#    ports:
+#      - "5555:5555"
+#    depends_on:
+#      - redis
+#      - celery_worker
+
+  flower:
+    image: mher/flower
+    container_name: flower
+    depends_on:
+      - redis
+      - celery_worker
+    env_file:
+      - .env
+    ports:
+      - "5555:5555"
+    command: ["celery", "flower", "--broker=redis://redis:6379/0", "--port=5555"]
+
+
+volumes:
+  mongo_db_data:
