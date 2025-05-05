@@ -57,8 +57,6 @@ cd SitemapParser
 docker compose up --build
 ```
 
-> 📂 Place your `.xml` sitemap files in the `sitemaps/` directory.
-
 ## 🔗 Example API Usage
 
 - Upload a sitemap for parsing:
@@ -67,7 +65,7 @@ docker compose up --build
   Body: { "url": "your sitemap url" }
   ```
 
-- List parsed URLs:
+- See Parser Status:
   ```
   GET /status
   ```
